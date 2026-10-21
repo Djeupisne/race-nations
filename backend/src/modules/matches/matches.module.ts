@@ -3,7 +3,7 @@
  * MatchSettlementService consomme la file Redis outbox alimentée par markValidated()
  * et délègue le règlement financier à BetSettlementService (BettingModule).
  */
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { RedisModule } from '../../redis/redis.module';
 import { WalletModule } from '../wallet/wallet.module';
@@ -14,7 +14,7 @@ import { MatchSettlementService } from './match-settlement.service';
 import { MatchesController } from './matches.controller';
 
 @Module({
-  imports: [PrismaModule, RedisModule, WalletModule, PlayersModule, BettingModule],
+  imports: [PrismaModule, RedisModule, WalletModule, PlayersModule, forwardRef(() => BettingModule)],
   providers: [MatchesService, MatchSettlementService],
   controllers: [MatchesController],
   exports: [MatchesService, MatchSettlementService],

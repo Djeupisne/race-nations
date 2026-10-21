@@ -7,13 +7,14 @@
  * Le lien paris passe par une outbox Redis (`bet.settlement` list) consommée par un worker :
  * FINISHED_VALIDATED et l'émission sont dans la MÊME transaction Prisma + publish post-commit.
  */
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { RedisService } from '../../redis/redis.service';
 import { WalletService } from '../wallet/wallet.service';
 import { PlayersService } from '../players/players.service';
 import { MatchesService } from './matches.service';
+import { BetSettlementService } from '../betting/bet-settlement.service';
 import { assertMatchTransition } from '../../common/state-machines/match.state-machine';
 import { NotFoundError } from '../../common/errors/domain-errors';
 
@@ -35,6 +36,9 @@ export class MatchSettlementService {
     private readonly wallet: WalletService,
     private readonly players: PlayersService,
     private readonly matches: MatchesService,
+    // Injection différée (forwardRef côté BettingModule) pour casser le cycle
+    // matches↔betting ; optionnelle pour que les workers hors-request démarrent.
+    @Optional() @Inject('BET_SETTLER') private readonly betSettler?: BetSettlementService,
   ) {}
 
   /**
@@ -119,15 +123,7 @@ export class MatchSettlementService {
       this.logger.error(`Unparseable bet.settlement payload dropped: ${raw.slice(0, 200)}`);
       return;
     }
-    const { BetSettlementService } = await import('../betting/bet-settlement.service');
-    void BetSettlementService; // résolu par DI ci-dessous via setter (voir module)
-    await this.settler?.settleMarket({ marketId: msg.marketId, winningSide: msg.winningSide, push: msg.push });
-  }
-
-  /** Injection différée pour casser le cycle matches↔betting (setter utilisé par le module). */
-  private settler?: { settleMarket(p: { marketId: string; winningSide?: number; push?: boolean }): Promise<unknown> };
-  setBetSettler(s: NonNullable<this['settler']>): void {
-    this.settler = s;
+    await this.betSettler?.settleMarket({ marketId: msg.marketId, winningSide: msg.winningSide, push: msg.push });
   }
 
   private inferWinningSide(ranked: Array<{ playerId: string }>, _matchId: string, marketId: string): number | null | undefined {

@@ -32,7 +32,8 @@ export class GoogleLoginVerifier {
     const payload = this.decodeJson(payloadB64);
 
     // Claims obligatoires
-    if (!TOKEN_URL_ISSUERS.has(payload.iss)) throw new AuthUnauthenticatedError({}, 'Invalid issuer.');
+    const iss = typeof payload.iss === 'string' ? payload.iss : '';
+    if (!TOKEN_URL_ISSUERS.has(iss)) throw new AuthUnauthenticatedError({}, 'Invalid issuer.');
     const clientId = this.config.get<string>('providers.google.clientId') ?? process.env.GOOGLE_CLIENT_ID ?? '';
     if (!clientId || payload.aud !== clientId) throw new AuthUnauthenticatedError({}, 'Invalid audience.');
     if (typeof payload.exp !== 'number' || payload.exp * 1000 < Date.now()) {
@@ -55,7 +56,11 @@ export class GoogleLoginVerifier {
     }
     if (!ok) throw new AuthUnauthenticatedError({}, 'Signature verification failed.');
 
-    return { sub: String(payload.sub), email: payload.email, name: payload.name };
+    return {
+      sub: String(payload.sub),
+      email: typeof payload.email === 'string' ? payload.email : undefined,
+      name: typeof payload.name === 'string' ? payload.name : undefined,
+    };
   }
 
   private decodeJson(b64url: string): Record<string, unknown> {
