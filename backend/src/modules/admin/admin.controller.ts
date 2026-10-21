@@ -103,7 +103,7 @@ export class AdminController {
 
   /** GET /v1/admin/audit?targetType=&targetId=&limit= — consultation journal append-only. */
   @Get('audit')
-  audit(@Query('targetType') targetType?: string, @Query('targetId') targetId?: string, @Query('limit') limit?: string) {
+  getAuditLog(@Query('targetType') targetType?: string, @Query('targetId') targetId?: string, @Query('limit') limit?: string) {
     return this.audit.search({ targetType, targetId, limit: limit ? Number(limit) : undefined });
   }
 }

@@ -20,16 +20,14 @@ const TRANSACTION_OPTIONS = {
 } as const;
 
 export function Transactional(): MethodDecorator {
-  return <T extends HasPrisma>(
-    _target: object,
-    propertyKey: string | symbol,
-    descriptor: TypedPropertyDescriptor<(this: T, ...args: never[]) => Promise<unknown>>,
-  ): void => {
-    const original = descriptor.value;
+  // Signature contrainte par MethodDecorator (TS2322) : le typage métier du `this`
+  // (HasPrisma) est rétabli par un cast interne, pas dans la signature publique.
+  return (_target: object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<any>): void => {
+    const original = descriptor.value as ((this: HasPrisma, ...args: any[]) => Promise<unknown>) | undefined;
     if (typeof original !== 'function') {
       throw new Error(`@Transactional can only decorate methods (${String(propertyKey)})`);
     }
-    descriptor.value = function (this: T, ...args: never[]): Promise<unknown> {
+    descriptor.value = function (this: HasPrisma, ...args: any[]): Promise<unknown> {
       const outer = this.prisma;
       if (!outer || typeof (outer as PrismaClient).$transaction !== 'function') {
         throw new Error(`@Transactional on ${String(propertyKey)}: this.prisma is not a PrismaClient`);
@@ -43,8 +41,8 @@ export function Transactional(): MethodDecorator {
             return Reflect.get(target, prop, receiver);
           },
         });
-        return original.apply(scoped as T, args);
+        return original.apply(scoped, args);
       }, TRANSACTION_OPTIONS);
-    } as TypedPropertyDescriptor<(this: T, ...args: never[]) => Promise<unknown>>['value'];
+    };
   };
 }

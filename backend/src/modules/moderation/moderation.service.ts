@@ -12,7 +12,10 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { NotFoundError, ValidationError } from '../../common/errors/domain-errors';
 import * as bannedWords from './banned-words.json';
 
-interface TextVerdict {
+/** Verdict du filtre texte — exporté : utilisé dans les signatures publiques de
+ * ModerationService, TextFilterService.inspect et ModerationController.filterTest
+ * (sinon TS4053 "cannot be named"). */
+export interface TextVerdict {
   clean: boolean;
   matchedTerms: string[];
   severity: 'none' | 'toxic' | 'cheat_ad' | 'pii';

@@ -17,8 +17,9 @@ export interface TimeoutMeta {
 }
 
 export const TIMEOUT_META_KEY = 'route:timeout';
-export const requestTimeout = (meta: TimeoutMeta) => (target: unknown, key?: string, desc?: PropertyDescriptor) => {
-  const holder = desc ? desc.value : key ? target[key as keyof typeof target] : target;
+export const requestTimeout = (meta: TimeoutMeta) => (target: object, key?: string, desc?: PropertyDescriptor) => {
+  // holder : descriptor de méthode, membre nommé du contrôleur, ou classe.
+  const holder = desc ? desc.value : key ? (target as Record<string, unknown>)[key] : target;
   Reflect.defineMetadata(TIMEOUT_META_KEY, meta, holder as object);
 };
 

@@ -57,7 +57,7 @@ export class BetSettlementService {
     });
     if (!market) throw new NotFoundError('BetMarket', params.marketId);
     if (market.status === 'SETTLED') throw new BetAlreadySettledError(market.id);
-    if (market.status !== 'LOCKED' && market.status !== 'RUNNING') {
+    if (market.status !== 'LOCKED') {
       throw new ValidationError({ field: 'status', reason: `Cannot settle a ${market.status} market.` });
     }
 
@@ -94,9 +94,8 @@ export class BetSettlementService {
 
       // 2) VERROU anti double-settlement : INSERT unique avant tout mouvement (INV-14).
       const idemKey = deriveLedgerKey('payout', market.id).replace('payout:', 'settle:'); // settle:<marketId>
-      let row: Prisma.BetSettlementCreateInput;
       try {
-        const created = await tx.betSettlement.create({
+        await tx.betSettlement.create({
           data: {
             marketId: market.id,
             totalPool: calc.totalPool,
@@ -105,10 +104,9 @@ export class BetSettlementService {
             payouts: payoutByBet as unknown as Prisma.InputJsonValue,
             residual: calc.residue,
             idempotencyKey: idemKey,
-            settledById: params.settledById,
+            settledBy: params.settledById ?? null,
           },
         });
-        void row;
         // 3) Mouvements ledger idempotents : payouts joueurs + coupelle+résidu House.
         const houseWalletId = await this.wallet.getHouseWalletId(tx);
         for (const b of escrowed) {
