@@ -49,7 +49,7 @@ export class UsersService {
     if (!ok) throw new AuthUnauthenticatedError({}, 'Current password is incorrect.');
 
     const hash = await argon2.hash(newPassword, ARGON2_OPTIONS);
-    const now = this.clock.date();
+    const now = this.clock.now();
     // Transaction (INV-30) : jamais un nouveau hash sans révocation des refresh vivants.
     await this.prisma.$transaction([
       this.prisma.user.update({ where: { id: userId }, data: { passwordHash: hash } }),
@@ -84,7 +84,7 @@ export class UsersService {
         await tx.player.update({
           where: { id: user.player.id },
           data: {
-            username: `${anonSuffix}-${Math.floor(this.clock.now() % 1_000_000)}`,
+            username: `${anonSuffix}-${Math.floor(this.clock.nowMs() % 1_000_000)}`,
             countryCode: 'XX',
             acceptedTermsAt: null,
             acceptedPrivacyAt: null,

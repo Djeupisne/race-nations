@@ -382,7 +382,7 @@ model Match {
   betMarkets BetMarket[]
   players    MatchPlayer[]
   result     ResultPayload?
-  tickets    MatchmakingTicket[] // <-- LA LIGNE QUI MANQUAIT
+  tickets    MatchmakingTicket[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
