@@ -1,0 +1,5 @@
+{
+  "toxic": ["connard", "encule", "fdp", "pd", "salaud", "merde", "pute", "nigger", "negre", "salope", "batard", "crétin", "idiot", "debile", "enculer", "bite"],
+  "cheat_ad": ["aimbot", "wallhack", "aim hack", "injecteur", "cheat engine", "scripts payants", "boost compte", "sellrank", "aimware", "streamproof"],
+  "pii": ["mon numero", "whatsapp", "snapchat add", "money send", "paypal"]
+}
