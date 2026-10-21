@@ -66,7 +66,7 @@ export class WalletRepository {
       walletId: string;
       column: CurrencyColumn;
       amount: number; // entier strictement positif (INV-01)
-      type: 'PURCHASE' | 'BET_ESCROW' | 'REVERSAL' | 'ADMIN_ADJUSTMENT';
+      type: 'PURCHASE' | 'BET_ESCROW' | 'REVERSAL' | 'HOUSE_REVERSAL' | 'ADMIN_ADJUSTMENT';
       idempotencyKey: string;
       refType?: string;
       refId?: string;

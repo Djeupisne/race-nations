@@ -6,7 +6,7 @@
  *   (anti-contournement des plafonds LCB/FT, INV-20).
  * - Aucun endpoint de "crédit" côté client : seul le webhook signe le SUCCEEDED.
  */
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import { z } from 'zod';
 import { PaymentsService } from './payments.service';
@@ -66,7 +66,7 @@ export class PaymentsController {
 
   /** GET /payments — historique paginé. */
   @Get()
-  async list(@CurrentUser() user: AuthenticatedUser, @ZodValidationPipe(PageRequestSchema) query: { limit: number; cursor?: string }) {
+  async list(@CurrentUser() user: AuthenticatedUser, @Query(new ZodValidationPipe(PageRequestSchema)) query: { limit: number; cursor?: string }) {
     return this.payments.listForPlayer(user.playerId, query);
   }
 
