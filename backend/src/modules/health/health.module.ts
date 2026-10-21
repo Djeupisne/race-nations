@@ -1,13 +1,12 @@
 /**
- * health.module.ts — probes /healthz & /readyz (docs/observability.md §2).
+ * HealthModule — probes k8s (liveness/readiness). Le contrôleur existant
+ * ping directement Prisma/Redis ; ce module ne fait que déclarer le
+ * controller et ses dépendances globales.
  */
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../../prisma/prisma.module';
-import { RedisModule } from '../../redis/redis.module';
 import { HealthController } from './health.controller';
 
 @Module({
-  imports: [PrismaModule, RedisModule],
   controllers: [HealthController],
 })
 export class HealthModule {}
