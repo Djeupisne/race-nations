@@ -77,7 +77,7 @@ export class AuthService {
     }
 
     const passwordHash = await argon2.hash(input.password, ARGON2_OPTIONS);
-    const now = this.clock.date();
+    const now = this.clock.now();
 
     // INV-30 : user + player + wallet atomiques.
     const created = await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -134,7 +134,7 @@ export class AuthService {
       // Le hash n'est plus vivant : soit expiré purgés, soit consommé → suspicion de vol.
       throw new RefreshReusedError(-1);
     }
-    if (stored.expiresAt.getTime() <= this.clock.now()) {
+    if (stored.expiresAt.getTime() <= this.clock.nowMs()) {
       await this.prisma.refreshToken.delete({ where: { id: stored.id } }).catch(() => undefined);
       throw new TokenExpiredError();
     }
@@ -155,7 +155,7 @@ export class AuthService {
     if (!stored) return; // logout idempotent : un token inconnu = déjà déconnecté
     await this.prisma.refreshToken.updateMany({
       where: { userId: stored.userId, family: stored.family, revokedAt: null },
-      data: { revokedAt: this.clock.date() },
+      data: { revokedAt: this.clock.now() },
     });
   }
 
@@ -167,7 +167,7 @@ export class AuthService {
     if (!player) throw new NotFoundError('Player', userId);
     // Pipeline KYC externe (provider) — ici on horodate la validation reçue du provider.
     // kycDocumentRef = référence chiffrée storage posée par l'upload présigné préalable.
-    const now = this.clock.date();
+    const now = this.clock.now();
     await this.prisma.player.update({
       where: { id: player.id },
       data: { ageVerifiedAt: now, birthDateConfirmed: true },
@@ -189,7 +189,7 @@ export class AuthService {
       nationality: player.nationality,
       ageVerified: player.ageVerifiedAt !== null,
       bettingHardAllowed: player.ageVerifiedAt !== null && player.reputation >= 30,
-      accessTokenExpiresAt: new Date(this.clock.now() + AuthService.ACCESS_TTL_S * 1000).toISOString(),
+      accessTokenExpiresAt: new Date(this.clock.nowMs() + AuthService.ACCESS_TTL_S * 1000).toISOString(),
     };
   }
 
@@ -205,7 +205,7 @@ export class AuthService {
       iss: 'race-nations-api',
       aud: 'race-nations-clients',
     };
-    const iatSec = Math.floor(this.clock.now() / 1000);
+    const iatSec = Math.floor(this.clock.nowMs() / 1000);
     const accessToken = await this.jwt.signAsync(
       { ...claims, iat: iatSec, exp: iatSec + AuthService.ACCESS_TTL_S },
       { expiresIn: AuthService.ACCESS_TTL_S },
@@ -217,7 +217,7 @@ export class AuthService {
         userId: user.id,
         tokenHash: sha256Hex(refreshToken),
         family: fam,
-        expiresAt: new Date(this.clock.now() + AuthService.REFRESH_TTL_S * 1000),
+        expiresAt: new Date(this.clock.nowMs() + AuthService.REFRESH_TTL_S * 1000),
       },
     });
     return { accessToken, refreshToken, expiresIn: AuthService.ACCESS_TTL_S };

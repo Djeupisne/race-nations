@@ -1,6 +1,6 @@
 /**
  * RedisService — file d'attente matchmaking, presence chat, rate limits, idempotence courte.
- * Clés préfixées rn: (multi-env sur un même cluster). Connexion lazy + retry exponentiel ;
+ * Clés préfixées rn: (multi-env sur un même cluster). Connexion lazy + retry borné ;
  * healthcheck /readyz ping (docs/observability.md). Les guards consomment getClient().
  */
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
@@ -13,12 +13,11 @@ export class RedisService implements OnModuleDestroy {
   private readonly client: Redis;
 
   constructor() {
-    this.client = new Redis({
-      url: process.env.REDIS_URL ?? 'redis://localhost:6379',
+    this.client = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
       keyPrefix: 'rn:',
-      maxRetriesPerRequest: 2,
+      maxRetriesPerRequest: 3,
       enableOfflineQueue: false, // fail-fast pour les routes monétaires (le guard décide fail-open/closed)
-      retryStrategy: (times) => Math.min(1000 * 2 ** times, 30_000),
+      retryStrategy: (times) => Math.min(times * 50, 2000),
     });
   }
 

@@ -1,23 +1,23 @@
 /**
  * Clock — horloge injectable (INV-29).
  * Règle stricte : AUCUN `new Date()` dans le code métier. Les fenêtres temporelles
- * (limite 24h INV-12, litige 72h INV-19, reconnexion 30s INV-17) utilisent Clock.now().
+ * (limite 24h INV-12, litige 72h INV-19, reconnexion 30s INV-17) passent par Clock.
  * En test : FixedClock fige le temps ; en prod : SystemClock.
  */
 export interface Clock {
-  /** Temps courant en ms epoch (source unique des comparaisons métier). */
-  now(): number;
-  /** Temps courant en Date — uniquement pour l'horodatage des colonnes createdAt/updatedAt métier. */
-  date(): Date;
+  /** Temps courant en Date — horodatage des colonnes createdAt/updatedAt et objets Date métier. */
+  now(): Date;
+  /** Temps courant en ms epoch (source unique des comparaisons et calculs de durée). */
+  nowMs(): number;
 }
 
 /** Horloge système (défaut DI en production). */
 export class SystemClock implements Clock {
-  now(): number {
-    return Date.now();
+  now(): Date {
+    return new Date();
   }
-  date(): Date {
-    return new Date(this.now());
+  nowMs(): number {
+    return Date.now();
   }
 }
 
@@ -27,11 +27,11 @@ export class FixedClock implements Clock {
   constructor(startMs: number | string = Date.now()) {
     this.current = typeof startMs === 'string' ? Date.parse(startMs) : startMs;
   }
-  now(): number {
-    return this.current;
-  }
-  date(): Date {
+  now(): Date {
     return new Date(this.current);
+  }
+  nowMs(): number {
+    return this.current;
   }
   set(ms: number | string): void {
     this.current = typeof ms === 'string' ? Date.parse(ms) : ms;
@@ -41,10 +41,10 @@ export class FixedClock implements Clock {
   }
 }
 
-/** Jeton DI — fournir SystemClock dans AppModule, remplacer dans les tests e2e. */
+/** Jeton DI — fournir SystemClock dans AppModule, remplacer par FixedClock dans les tests e2e. */
 export const CLOCK = Symbol('CLOCK');
 
-/** Helper : âge en ms d'un timestamp par rapport à l'horloge fournie. */
+/** Helper : âge en ms d'un timestamp par rapport à l'horloge fournie (jamais négatif). */
 export function ageMs(sinceEpochMs: number, clock: Clock): number {
-  return Math.max(0, clock.now() - sinceEpochMs);
+  return Math.max(0, clock.nowMs() - sinceEpochMs);
 }
