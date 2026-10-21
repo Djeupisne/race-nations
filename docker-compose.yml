@@ -1,0 +1,51 @@
+# =============================================================================
+# Race Nations - Infrastructure locale (dev)
+# PostgreSQL 16 + Redis 7. Lancer: docker compose up -d
+# Backend NestJS: cd backend && pnpm start:dev (PORT env ci-dessous)
+# Notes:
+#  - INV-01/02 : money = INT (centimes); les CHECK balance>=0 vivent en DB.
+#  - REDIS sert de cache odds/rate-limit/idempotency (voir redis.service.ts).
+# =============================================================================
+name: race-nations
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: rn-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rn
+      POSTGRES_PASSWORD: rn_dev_password
+      POSTGRES_DB: rn_dev
+      # Horodatage serveur pour INV-29 (createdAt/updatedAt DB, pas app)
+      TZ: UTC
+      PGTZ: UTC
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rn -d rn_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: rn-redis
+    restart: unless-stopped
+    # AOF activé: les files settlement/idempotency survivent aux redémarrages.
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "volatile-lru"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
+  redisdata:
