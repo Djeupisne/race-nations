@@ -153,7 +153,10 @@ export class PlayersService {
         where.division = query.filter.toUpperCase() as Prisma.EnumDivisionFilter<"Player">;
         break;
       case 'clan':
-        where.clanMembership = query.filter ? { clanId: query.filter } : { NOT: null };
+        // relation 1:1 nullable : le filtre "membres d'un clan" = membership non nulle.
+        // `{ NOT: null }` n'est pas dans le type Prisma (ClanMembershipNullableRelationFilter) ;
+        // `{ isNot: null }` est la syntaxe supportée pour une relation optionnelle.
+        where.clanMembership = query.filter ? { clanId: query.filter } : { isNot: null };
         break;
       case 'vehicle':
         where.ownedVehicles = { some: { vehicleId: query.filter ?? '' } };
