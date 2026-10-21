@@ -101,4 +101,31 @@ export class UsersService {
     });
     return { deleted: true };
   }
+
+  /** ProfilSelf — projection sans PII sensible pour GET /users/me. */
+  async getProfile(userId: string): Promise<Record<string, unknown>> {
+    const user = await this.findById(userId);
+    if (!user) throw new NotFoundError({}, 'User not found.');
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      emailVerified: user.emailVerifiedAt !== null,
+      createdAt: user.createdAt,
+    };
+  }
+
+  async updateProfile(
+    userId: string,
+    dto: { displayName?: string; avatarKey?: string; preferredLanguage?: string },
+  ): Promise<Record<string, unknown>> {
+    // Champs whitelist uniquement — jamais role/email ici.
+    const data: Record<string, unknown> = {};
+    if (dto.displayName !== undefined) data.displayName = dto.displayName;
+    if (dto.avatarKey !== undefined) data.avatarKey = dto.avatarKey;
+    if (dto.preferredLanguage !== undefined) data.preferredLanguage = dto.preferredLanguage;
+    const updated = await this.prisma.user.update({ where: { id: userId }, data });
+    return { id: updated.id, displayName: updated.displayName };
+  }
+
 }
