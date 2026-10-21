@@ -12,11 +12,29 @@ import { RateLimitedError } from '../errors/domain-errors';
 import { CLOCK, type Clock } from '../utils/clock';
 
 export interface RateLimitMeta {
-  bucket: string;
-  limit: number;
-  windowMs: number;
+  /** Seau de comptage — clé Redis rl:<bucket>:<identité>. */
+  bucket?: string;
+  /** Alias de `bucket` utilisé par betting.controller (bet:create, bet:join). */
+  keyPrefix?: string;
+  limit?: number;
+  /** Alias de `limit` utilisé par payments.controller (points). */
+  points?: number;
+  /** Fenêtre en millisecondes. */
+  windowMs?: number;
+  /** Alias de `windowMs` utilisé par payments.controller (durationMs). */
+  durationMs?: number;
+  /** Alias de `windowMs` en secondes, utilisé par betting.controller (windowSeconds). */
+  windowSeconds?: number;
   /** routes monétaires : refuser si Redis KO (défaut false). */
   failClosed?: boolean;
+}
+
+/** Résolution des métadonnées : accepte les alias (keyPrefix/points/windowSeconds/durationMs). */
+function resolveRateLimit(meta: RateLimitMeta): { key: string; limit: number; windowMs: number; failClosed: boolean } {
+  const bucket = meta.bucket ?? meta.keyPrefix ?? 'default';
+  const limit = meta.limit ?? meta.points ?? 60;
+  const windowMs = meta.windowMs ?? meta.durationMs ?? (meta.windowSeconds !== undefined ? meta.windowSeconds * 1000 : 60_000);
+  return { key: bucket, limit, windowMs, failClosed: meta.failClosed ?? false };
 }
 
 export const RATE_LIMIT_META_KEY = 'ratelimit:meta';
@@ -59,11 +77,12 @@ export class RateLimitGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const meta = this.reflector.get<RateLimitMeta>(RATE_LIMIT_META_KEY, context.getHandler());
-    if (!meta) return true;
+    const rawMeta = this.reflector.get<RateLimitMeta>(RATE_LIMIT_META_KEY, context.getHandler());
+    if (!rawMeta) return true;
+    const meta = resolveRateLimit(rawMeta);
     const req = context.switchToHttp().getRequest<{ user?: { playerId?: string }; ip?: string; res?: { setHeader(k: string, v: string): void } }>();
     const identity = req.user?.playerId ?? req.ip ?? 'anonymous';
-    const key = `rl:${meta.bucket}:${identity}`;
+    const key = `rl:${meta.key}:${identity}`;
     let result: number[] | number;
     try {
       result = await this.redis.getClient().eval(SLIDING_WINDOW_LUA, 1, key, String(this.clock.nowMs()), String(meta.windowMs), String(meta.limit));

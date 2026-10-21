@@ -10,19 +10,27 @@
  */
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import type { Request } from 'express';
 import { ForbiddenAdminError, NotFoundError } from '../errors/domain-errors';
 
 export interface OwnershipMeta {
   /** table Prisma à charger (whitelist stricte ci-dessous). */
-  model: 'bet' | 'betMarket' | 'wallet' | 'match' | 'ticket' | 'player';
+  model?: 'bet' | 'betMarket' | 'wallet' | 'match' | 'ticket' | 'player';
   /** nom du paramètre de route contenant l'id de la ressource. */
-  idParam: string;
+  idParam?: string;
+  /** Alias utilisé par matches.controller : 'self' = le joueur du JWT ; 'matchParticipant' = participant au match :id. */
+  resource?: 'self' | 'matchParticipant' | 'bet' | 'betMarket' | 'wallet' | 'match' | 'ticket' | 'player';
 }
 
 export const OWNERSHIP_META_KEY = 'ownership:resource';
-export const ownership = (meta: OwnershipMeta) => (target: unknown, key?: string, desc?: PropertyDescriptor) => {
+export const ownership = (meta: OwnershipMeta) => <T extends object>(
+  target: T,
+  key?: keyof T & string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  desc?: TypedPropertyDescriptor<any>,
+) => {
   const reflectorSetMetadata = Reflect.defineMetadata;
-  const holder = desc ? desc.value : key ? target[key as keyof typeof target] : target;
+  const holder = desc ? desc.value : key ? target[key] : target;
   reflectorSetMetadata(OWNERSHIP_META_KEY, meta, holder as object);
 };
 

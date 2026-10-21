@@ -44,7 +44,8 @@ export class ServerAuthGuard implements CanActivate {
     // timing-safe et le raw body brut (pas le JSON ré-encodé par express) est la source.
     const secret = process.env.GAMESERVER_SHARED_SECRET ?? 'dev-only-insecure-gameserver-secret';
     const raw = req.rawBody?.toString('utf8') ?? '';
-    if (!verifySignedHeader({ secret, timestamp: ts, rawBody: raw, providedHex: signature })) {
+    // Header au format Stripe : `t=<ts>,v1=<hex>` — vérification HMAC temps constant + fraîcheur.
+    if (!verifySignedHeader(`t=${ts},v1=${signature}`, raw, secret, this.clock.nowMs(), 120_000).valid) {
       throw new AuthUnauthenticatedError();
     }
     (req as Request & { gameServerId?: string }).gameServerId = server.id;

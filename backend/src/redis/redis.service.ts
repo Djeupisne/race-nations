@@ -10,15 +10,11 @@ export type RedisClient = Redis;
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
-  private readonly client: Redis;
+  /** Publique : ws-hub.service.ts et match-settlement.service.ts y accèdent directement. */
+  public readonly client: Redis;
 
   constructor() {
-    this.client = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-      keyPrefix: 'rn:',
-      maxRetriesPerRequest: 3,
-      enableOfflineQueue: false, // fail-fast pour les routes monétaires (le guard décide fail-open/closed)
-      retryStrategy: (times) => Math.min(times * 50, 2000),
-    });
+    this.client = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
   }
 
   getClient(): Redis {
