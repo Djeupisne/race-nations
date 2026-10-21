@@ -34,7 +34,7 @@ export class AppleNotificationsVerifier implements WebhookVerifier {
     const rootPem = process.env.APPLE_ROOT_CA_PEM;
     if (!leafDer || !rootPem) return { valid: false, reason: 'NO_MATCHING_SIGNATURE' };
     const leafKey = createPublicKey({ key: Buffer.from(leafDer, 'base64'), format: 'der', type: 'x509' });
-    const ok = cryptoVerify('RSA-SHA256', Buffer.from(`${parts[0]}.${parts[1}`), leafKey, Buffer.from(parts[2], 'base64'));
+    const ok = cryptoVerify('RSA-SHA256', Buffer.from(`${parts[0]}.${parts[1]}`), leafKey, Buffer.from(parts[2], 'base64'));
     if (!ok) return { valid: false, reason: 'NO_MATCHING_SIGNATURE' };
 
     const uuid = payload.notificationUUID;
