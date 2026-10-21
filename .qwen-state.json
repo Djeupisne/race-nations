@@ -2,13 +2,13 @@
   "project": "race-nations",
   "version": "1.0.0",
   "currentPhase": "PHASE_1",
-  "currentTask": "docs/betting.md",
+  "currentTask": "docs/betting-legal.md",
   "completedTasks": [
     "docs/invariants.md",
-    "docs/api.md"
+    "docs/api.md",
+    "docs/betting.md"
   ],
   "pendingTasks": [
-    "docs/betting.md",
     "docs/betting-legal.md",
     "docs/observability.md",
     "docs/api-versioning.md",
@@ -125,5 +125,5 @@
     "docs/runbook.md"
   ],
   "blockers": [],
-  "lastUpdated": "2026-10-21T05:10:46Z"
+  "lastUpdated": "2026-10-21T00:00:00+00:00"
 }
