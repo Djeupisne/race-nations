@@ -73,7 +73,7 @@ describe('House Wallet E2E — commissions exactes et tracées', () => {
     expect(playerFees).toBe(0);
   });
 
-  it('ledger House append-only : la commission d’un marché n'apparaît qu'une fois (INV-06/14)', async () => {
+  it('ledger House append-only : la commission d’un marché n\'apparaît qu\'une fois (INV-06/14)', async () => {
     const settled = await prisma.betMarket.findMany({ where: { status: 'SETTLED' } });
     for (const m of settled) {
       const s = await settlementOf(prisma, m.id);
