@@ -18,7 +18,19 @@
     "resolveJsonModule": true,
     "downlevelIteration": true,
     "paths": {
-      "@race-nations/api-contracts": ["../shared/api-contracts/src/index.ts"]
+      "@race-nations/api-contracts": [
+        "../shared/api-contracts/src/index.ts"
+      ]
     }
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "../shared/api-contracts/src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "test",
+    "dist",
+    "**/*spec.ts"
+  ]
 }

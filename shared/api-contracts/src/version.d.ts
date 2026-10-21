@@ -1,0 +1,20 @@
+export declare const API_MAJOR: 1;
+export declare const API_MINOR: 0;
+export declare const API_PATCH: 0;
+export declare const API_SEMVER: "1.0.0";
+export declare const API_PREFIX: "/api/v1";
+export declare const WS_PREFIX: "/ws/v1";
+export declare const RACENET_PROTOCOL_VERSION: 1;
+export declare const GAMESERVER_WEBHOOK_SCHEMA_VERSION: 1;
+export type ApiMajor = typeof API_MAJOR;
+export type RacenetProtocol = typeof RACENET_PROTOCOL_VERSION;
+export declare const API_HEADERS: {
+    readonly VERSION: "X-API-Version";
+    readonly BUILD: "X-API-Build";
+    readonly DEPRECATION: "Deprecation";
+    readonly SUNSET: "Sunset";
+    readonly REQUEST_ID: "X-Request-Id";
+    readonly IDEMPOTENCY_KEY: "Idempotency-Key";
+};
+export declare function compareSemver(a: string, b: string): number;
+export declare function isCompatible(clientMajor: number, serverMajor: number): boolean;

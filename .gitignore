@@ -1,8 +1,2 @@
+*.js.map
 node_modules/
-dist/
-build/
-target/
-coverage/
-htmlcov/
-*.pyc
-__pycache__/
