@@ -1,24 +1,24 @@
 {
   "project": "race-nations",
   "version": "1.0.0",
-  "currentPhase": "PHASE_1",
-  "currentTask": "docs/betting-legal.md",
+  "currentPhase": "PHASE_2",
+  "currentTask": "backend/prisma/schema.prisma",
   "completedTasks": [
     "docs/invariants.md",
     "docs/api.md",
-    "docs/betting.md"
-  ],
-  "pendingTasks": [
-    "docs/betting-legal.md",
+    "docs/betting.md",
     "docs/observability.md",
     "docs/api-versioning.md",
     "shared/api-contracts/src/version.ts",
     "shared/api-contracts/src/enums.ts",
     "shared/api-contracts/src/auth.ts",
     "shared/api-contracts/src/player.ts",
+    "shared/api-contracts/src/index.ts"
+  ],
+  "pendingTasks": [
+    "docs/betting-legal.md",
     "shared/api-contracts/src/match.ts",
     "shared/api-contracts/src/betting.ts",
-    "shared/api-contracts/src/index.ts",
     "backend/prisma/schema.prisma",
     "backend/prisma/migrations/0004_constraints/migration.sql",
     "backend/prisma/migrations/0005_betting/migration.sql",
@@ -125,5 +125,5 @@
     "docs/runbook.md"
   ],
   "blockers": [],
-  "lastUpdated": "2026-10-21T00:00:00+00:00"
+  "lastUpdated": "2026-10-21T05:30:34.169950+00:00"
 }
