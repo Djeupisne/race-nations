@@ -22,7 +22,10 @@ export function verifyWsToken(secret: string, token: string | undefined): Authen
     }) as Record<string, unknown> & { sub?: string; typ?: string };
     // Les refresh tokens ne donnent JAMAIS accès au WS.
     if (claims.typ === 'refresh' || typeof claims.sub !== 'string') return null;
-    return { userId: claims.sub, playerId: String(claims.playerId ?? ''), role: String(claims.role ?? 'player') };
+    const rawRole = String(claims.role ?? 'PLAYER').toUpperCase();
+    const role: AuthenticatedUser['role'] =
+      rawRole === 'MODERATOR' || rawRole === 'ADMIN' || rawRole === 'SYSTEM' ? rawRole : 'PLAYER';
+    return { userId: claims.sub, playerId: String(claims.playerId ?? ''), role };
   } catch {
     return null;
   }

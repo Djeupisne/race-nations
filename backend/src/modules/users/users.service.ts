@@ -104,13 +104,16 @@ export class UsersService {
 
   /** ProfilSelf — projection sans PII sensible pour GET /users/me. */
   async getProfile(userId: string): Promise<Record<string, unknown>> {
-    const user = await this.findById(userId);
-    if (!user) throw new NotFoundError({}, 'User not found.');
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { player: { select: { username: true } } },
+    });
+    if (!user) throw new NotFoundError('User', userId);
     return {
       id: user.id,
       email: user.email,
       role: user.role,
-      emailVerified: user.emailVerifiedAt !== null,
+      displayName: user.player?.username ?? null,
       createdAt: user.createdAt,
     };
   }
@@ -120,12 +123,21 @@ export class UsersService {
     dto: { displayName?: string; avatarKey?: string; preferredLanguage?: string },
   ): Promise<Record<string, unknown>> {
     // Champs whitelist uniquement — jamais role/email ici.
-    const data: Record<string, unknown> = {};
-    if (dto.displayName !== undefined) data.displayName = dto.displayName;
-    if (dto.avatarKey !== undefined) data.avatarKey = dto.avatarKey;
-    if (dto.preferredLanguage !== undefined) data.preferredLanguage = dto.preferredLanguage;
-    const updated = await this.prisma.user.update({ where: { id: userId }, data });
-    return { id: updated.id, displayName: updated.displayName };
+    // displayName/préférences vivent sur Player (le modèle User ne porte que
+    // l'identité d'authentification) ; avatarKey n'a pas de colonne en base et
+    // est ignoré tant que le stockage d'avatars n'est pas branché.
+    const playerData: Record<string, unknown> = {};
+    if (dto.displayName !== undefined) playerData.username = dto.displayName;
+    if (dto.preferredLanguage !== undefined) playerData.preferredLanguage = dto.preferredLanguage;
+    let displayName: string | null = null;
+    if (Object.keys(playerData).length > 0) {
+      const updated = await this.prisma.player.update({ where: { userId }, data: playerData });
+      displayName = updated.username;
+    } else {
+      const player = await this.prisma.player.findUnique({ where: { userId }, select: { username: true } });
+      displayName = player?.username ?? null;
+    }
+    return { id: userId, displayName };
   }
 
 }

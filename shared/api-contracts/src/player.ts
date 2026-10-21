@@ -59,7 +59,7 @@ export const UpdatePlayerInputSchema = z
     marketingOptIn: z.boolean().optional(),
   })
   .strict()
-  .refine((v) => Object.keys(v).length > 0, { message: 'At least one field required.' });
+  .refine((v: Record<string, unknown>) => Object.keys(v).length > 0, { message: 'At least one field required.' });
 export type UpdatePlayerInput = z.infer<typeof UpdatePlayerInputSchema>;
 
 /* ------------------------------ Stats -------------------------------- */

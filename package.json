@@ -1,0 +1,9 @@
+{
+  "name": "race-nations",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start:dev": "pnpm --filter @race-nations/backend start:dev",
+    "build": "pnpm -r build"
+  }
+}

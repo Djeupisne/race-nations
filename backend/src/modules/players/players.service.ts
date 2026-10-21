@@ -150,10 +150,10 @@ export class PlayersService {
         break;
       case 'division':
         if (!query.filter) throw new ValidationError({ field: 'filter', reason: 'Required for scope=division.' });
-        where.division = query.filter as Prisma.DivisionFilter;
+        where.division = query.filter.toUpperCase() as Prisma.EnumDivisionFilter<"Player">;
         break;
       case 'clan':
-        where.clanMembership = query.filter ? { clanId: query.filter } : { not: null };
+        where.clanMembership = query.filter ? { clanId: query.filter } : { NOT: null };
         break;
       case 'vehicle':
         where.ownedVehicles = { some: { vehicleId: query.filter ?? '' } };
