@@ -1,8 +1,8 @@
 {
   "project": "race-nations",
   "version": "1.0.0",
-  "currentPhase": "PHASE_3",
-  "currentTask": "backend/test/fixtures/player.fixture.ts",
+  "currentPhase": "DONE",
+  "currentTask": null,
   "completedTasks": [
     "docs/invariants.md",
     "docs/api.md",
@@ -88,9 +88,21 @@
     "backend/src/modules/admin/admin.controller.ts",
     "backend/src/modules/audit/audit.service.ts",
     "backend/src/modules/moderation/moderation.service.ts",
-    "backend/src/modules/sanctions/sanctions.service.ts"
-  ],
-  "pendingTasks": [
+    "backend/src/modules/sanctions/sanctions.service.ts",
+    "unity/Packages/com.racenations.betting/Runtime/BettingApi.cs",
+    "unity/Packages/com.racenations.betting/Runtime/BettingManager.cs",
+    "unity/Packages/com.racenations.betting/Runtime/Dtos/BettingDtos.cs",
+    "unity/Packages/com.racenations.server/Runtime/ServerBootstrap.cs",
+    "unity/Packages/com.racenations.server/Runtime/RaceServerManager.cs",
+    "unity/Packages/com.racenations.server/Runtime/ServerValidation.cs",
+    "admin-panel/src/lib/api.ts",
+    "admin-panel/src/app/betting/page.tsx",
+    "admin-panel/src/app/betting/[id]/settle/page.tsx",
+    "admin-panel/src/app/house-wallet/page.tsx",
+    "scripts/dev-up.sh",
+    "scripts/migrate.sh",
+    "scripts/seed-prod.sh",
+    "scripts/build-server.sh",
     "backend/test/fixtures/player.fixture.ts",
     "backend/test/fixtures/wallet.fixture.ts",
     "backend/test/fixtures/bet.fixture.ts",
@@ -108,22 +120,9 @@
     "unity/Packages/com.racenations.gameplay/Runtime/Vehicles/VehicleController.cs",
     "unity/Packages/com.racenations.gameplay/Runtime/Race/RaceManager.cs",
     "unity/Packages/com.racenations.gameplay/Runtime/Race/CheckpointTracker.cs",
-    "unity/Packages/com.racenations.racenet/Runtime/RaceNetworkManager.cs",
-    "unity/Packages/com.racenations.betting/Runtime/BettingApi.cs",
-    "unity/Packages/com.racenations.betting/Runtime/BettingManager.cs",
-    "unity/Packages/com.racenations.betting/Runtime/Dtos/BettingDtos.cs",
-    "unity/Packages/com.racenations.server/Runtime/ServerBootstrap.cs",
-    "unity/Packages/com.racenations.server/Runtime/RaceServerManager.cs",
-    "unity/Packages/com.racenations.server/Runtime/ServerValidation.cs",
-    "admin-panel/src/app/betting/page.tsx",
-    "admin-panel/src/app/betting/[id]/settle/page.tsx",
-    "admin-panel/src/app/house-wallet/page.tsx",
-    "admin-panel/src/lib/api.ts",
-    "scripts/dev-up.sh",
-    "scripts/migrate.sh",
-    "scripts/seed-prod.sh",
-    "scripts/build-server.sh"
+    "unity/Packages/com.racenations.racenet/Runtime/RaceNetworkManager.cs"
   ],
+  "pendingTasks": [],
   "blockers": [],
-  "lastUpdated": "2026-10-21T00:00:00Z"
+  "lastUpdated": "2026-10-21T00:00:00+00:00"
 }
