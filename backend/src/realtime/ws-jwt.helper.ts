@@ -25,7 +25,10 @@ export function verifyWsToken(secret: string, token: string | undefined): Authen
     const rawRole = String(claims.role ?? 'PLAYER').toUpperCase();
     const role: AuthenticatedUser['role'] =
       rawRole === 'MODERATOR' || rawRole === 'ADMIN' || rawRole === 'SYSTEM' ? rawRole : 'PLAYER';
-    return { userId: claims.sub, playerId: String(claims.playerId ?? ''), role };
+    // `fam` = famille de refresh présente dans l'access token (AccessTokenClaims.fam) ;
+    // AuthenticatedUser exige `family` — défaut 0 si claim absent (token legacy).
+    const family = typeof claims.fam === 'number' ? claims.fam : 0;
+    return { userId: claims.sub, playerId: String(claims.playerId ?? ''), role, family };
   } catch {
     return null;
   }

@@ -14,7 +14,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { WalletRepository, type CurrencyColumn } from '../wallet/wallet.repository';
 import { deriveLedgerKey } from '../../common/guards/idempotency.guard';
 import { computeParimutuelSettlement, computePushRefund, type ParimutuelStake } from '../../common/utils/parimutuel';
-import { assertBetTransition } from '../../common/state-machines/bet.state-machine';
+import { assertBetTransition, type BetState } from '../../common/state-machines/bet.state-machine';
 import { assertBetMarketTransition } from '../../common/state-machines/bet-market.state-machine';
 import { BetAlreadySettledError } from '../../common/errors/betting-errors';
 import { NotFoundError, ValidationError } from '../../common/errors/domain-errors';
@@ -232,7 +232,10 @@ export class BetSettlementService {
           refType: 'BET_MARKET',
           refId: marketId,
         });
-        if (b.status !== 'REFUNDED' && b.status !== 'VOIDED') assertBetTransition(b.status, 'REFUNDED');
+        // b.status est typé Prisma.BetStatus (sans PENDING/ACCEPTED ici, cf. filtre ci-dessus) ;
+        // REFUNDED/VOIDED sont déjà terminaux → on ne rejoue pas la transition (idempotence INV-14).
+        const currentBetState = b.status as BetState;
+        if (currentBetState !== 'REFUNDED' && currentBetState !== 'VOIDED') assertBetTransition(currentBetState, 'REFUNDED');
         await tx.bet.update({ where: { id: b.id }, data: { status: 'REFUNDED', result: 'REFUND' } });
       }
       await tx.betMarket.update({ where: { id: marketId }, data: { status: 'CANCELLED', cancelledAt: new Date() } });
