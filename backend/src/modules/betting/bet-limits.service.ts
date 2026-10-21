@@ -38,7 +38,7 @@ export class BetLimitsService {
   assertStakeBounds(currency: 'SOFT' | 'HARD', stake: number): void {
     const { min, max } = stakeBounds(currency);
     if (!Number.isSafeInteger(stake) || stake < min || stake > max) {
-      throw new BetStakeOutOfRangeError(currency, stake, min, max);
+      throw new BetStakeOutOfRangeError(min, max, stake);
     }
   }
 
@@ -55,7 +55,7 @@ export class BetLimitsService {
       const used = await this.sumEscrowSince(ctx.playerId, 'CREDITS', since);
       const limit = this.config.constants.DAILY_SOFT_LIMIT;
       if (used + additionalStake > limit) {
-        throw new BetDailyLimitExceededError('SOFT-daily', used, limit);
+        throw new BetDailyLimitExceededError(limit, used, additionalStake);
       }
       return;
     }
@@ -80,13 +80,13 @@ export class BetLimitsService {
       this.config.constants.MONTHLY_HARD_CAP_CENTS,
     );
     if (usedMonth + additionalStake > monthlyCap) {
-      throw new BetDailyLimitExceededError('HARD-monthly', usedMonth, monthlyCap);
+      throw new BetDailyLimitExceededError(monthlyCap, usedMonth, additionalStake);
     }
     if (juris.dailyHardLimitCents !== null) {
       const dayAgo = new Date(this.clock.nowMs() - 24 * 3_600_000);
       const usedDay = await this.sumEscrowSince(ctx.playerId, 'HARD_CENTS', dayAgo);
       if (usedDay + additionalStake > juris.dailyHardLimitCents) {
-        throw new BetDailyLimitExceededError('HARD-daily', usedDay, juris.dailyHardLimitCents);
+        throw new BetDailyLimitExceededError(juris.dailyHardLimitCents, usedDay, additionalStake);
       }
     }
   }

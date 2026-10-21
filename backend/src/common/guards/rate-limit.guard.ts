@@ -38,8 +38,9 @@ function resolveRateLimit(meta: RateLimitMeta): { key: string; limit: number; wi
 }
 
 export const RATE_LIMIT_META_KEY = 'ratelimit:meta';
-export const rateLimit = (meta: RateLimitMeta) => (target: unknown, key?: string, desc?: PropertyDescriptor) => {
-  const holder = desc ? desc.value : key ? target[key as keyof typeof target] : target;
+export const rateLimit = (meta: RateLimitMeta) => (target: object, key?: string, desc?: PropertyDescriptor) => {
+  // holder : descriptor de méthode, membre nommé du contrôleur, ou classe (usage décorateur de classe).
+  const holder = desc ? desc.value : key ? (target as Record<string, unknown>)[key] : target;
   Reflect.defineMetadata(RATE_LIMIT_META_KEY, meta, holder as object);
 };
 
