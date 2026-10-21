@@ -95,7 +95,7 @@ export class BetSettlementService {
       // 2) VERROU anti double-settlement : INSERT unique avant tout mouvement (INV-14).
       const idemKey = deriveLedgerKey('payout', market.id).replace('payout:', 'settle:'); // settle:<marketId>
       try {
-        await tx.betSettlement.create({
+        const created = await tx.betSettlement.create({
           data: {
             marketId: market.id,
             totalPool: calc.totalPool,

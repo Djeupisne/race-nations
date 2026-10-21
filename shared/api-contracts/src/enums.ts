@@ -118,7 +118,7 @@ export const BetStatusSchema = z.enum([
 export type BetStatus = z.infer<typeof BetStatusSchema>;
 
 export const BetMarketStatusSchema = z.enum([
-  'OPEN', 'CHALLENGED', 'LOCKED', 'SETTLING', 'SETTLED', 'DISPUTED', 'CANCELLED',
+  'OPEN', 'CHALLENGED', 'LOCKED', 'RUNNING', 'SETTLING', 'SETTLED', 'DISPUTED', 'CANCELLED',
 ]);
 export type BetMarketStatus = z.infer<typeof BetMarketStatusSchema>;
 

@@ -15,6 +15,7 @@ export type BetMarketState =
   | 'OPEN'
   | 'CHALLENGED'
   | 'LOCKED'
+  | 'RUNNING'
   | 'SETTLING'
   | 'SETTLED'
   | 'DISPUTED'
@@ -23,7 +24,8 @@ export type BetMarketState =
 const BET_MARKET_TRANSITIONS: Readonly<Record<BetMarketState, readonly BetMarketState[]>> = Object.freeze({
   OPEN: ['CHALLENGED', 'CANCELLED'],
   CHALLENGED: ['LOCKED', 'DISPUTED', 'CANCELLED'],
-  LOCKED: ['SETTLING', 'DISPUTED', 'CANCELLED'], // LOCKED = escrows posés + match lancé (INV-15)
+  LOCKED: ['RUNNING', 'SETTLING', 'DISPUTED', 'CANCELLED'], // LOCKED = escrows posés (INV-15)
+  RUNNING: ['SETTLING', 'DISPUTED', 'CANCELLED'], // match lancé, résultat à venir
   SETTLING: ['SETTLED', 'DISPUTED'],
   SETTLED: [],
   DISPUTED: ['SETTLING', 'CANCELLED'], // résolution admin dans les 72h (INV-19)
