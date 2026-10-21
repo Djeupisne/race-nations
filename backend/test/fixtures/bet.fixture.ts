@@ -9,7 +9,7 @@
  * UNIQUE(marketId, playerId) sur Bet, montants entiers = INV-01).
  */
 import { randomUUID } from 'node:crypto';
-import type { BetMarket, Bet, PrismaClient } from '@prisma/client';
+import type { BetMarket, Bet, PrismaClient, Prisma } from '@prisma/client';
 
 /** Track de test partagé — inséré idempotamment (les E2E n'ont pas de seed circuits). */
 export const TEST_TRACK_ID = '11111111-1111-4111-8111-111111111111';
