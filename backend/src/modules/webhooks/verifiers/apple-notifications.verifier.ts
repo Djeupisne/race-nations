@@ -5,7 +5,7 @@
  */
 import { Injectable } from '@nestjs/common';
 import type { Request } from 'express';
-import { createPublicKey, verify as cryptoVerify } from 'node:crypto';
+import { X509Certificate, createPublicKey, verify as cryptoVerify } from 'node:crypto';
 import type { WebhookVerifier, WebhookVerdict } from './verifier.interface';
 
 const b64urlJson = <T>(seg: string): T => JSON.parse(Buffer.from(seg.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8')) as T;
@@ -30,10 +30,17 @@ export class AppleNotificationsVerifier implements WebhookVerifier {
     }
     // Chaîne de confiance : le certificat feuille (x5c[0]) doit signer le JWS ; son émetteur
     // remonte à la racine Apple fournie en config. Sans ancre → fail-closed.
+    // x5c[0] est un certificat DER complet : on l'parse via X509Certificate puis
+    // on en extrait la clé publique (createPublicKey n'accepte pas type:'x509').
     const leafDer = header.x5c?.[0];
     const rootPem = process.env.APPLE_ROOT_CA_PEM;
     if (!leafDer || !rootPem) return { valid: false, reason: 'NO_MATCHING_SIGNATURE' };
-    const leafKey = createPublicKey({ key: Buffer.from(leafDer, 'base64'), format: 'der', type: 'x509' });
+    let leafKey;
+    try {
+      leafKey = createPublicKey(new X509Certificate(Buffer.from(leafDer, 'base64')).publicKey);
+    } catch {
+      return { valid: false, reason: 'MALFORMED' };
+    }
     const ok = cryptoVerify('RSA-SHA256', Buffer.from(`${parts[0]}.${parts[1]}`), leafKey, Buffer.from(parts[2], 'base64'));
     if (!ok) return { valid: false, reason: 'NO_MATCHING_SIGNATURE' };
 

@@ -48,10 +48,9 @@ export class MatchesController {
   @UseGuards(OwnershipGuard)
   @ownership({ resource: 'matchParticipant' })
   join(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser, @Body(joinPipe) body: JoinMatchInput) {
-    // body.matchId contrôlé égal à :id (le pipe strict l'a validé ; cohérence défensive ici).
-    if (body.matchId !== id) {
-      return Promise.reject(new Error('path/body matchId mismatch'));
-    }
+    // Le contrat JoinMatchInput ne porte que `ticketId` (optionnel) — le match
+    // est identifié par la route :id ; aucune cohérence path/body à contrôler ici.
+    void body;
     return this.matches.join(id, user.playerId);
   }
 

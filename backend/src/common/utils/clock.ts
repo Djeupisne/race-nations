@@ -44,6 +44,9 @@ export class FixedClock implements Clock {
 /** Jeton DI — fournir SystemClock dans AppModule, remplacer par FixedClock dans les tests e2e. */
 export const CLOCK = Symbol('CLOCK');
 
+/** Instance système partagée (pragmatique pour scripts/tests qui importent `clock`). */
+export const clock: Clock = new SystemClock();
+
 /** Helper : âge en ms d'un timestamp par rapport à l'horloge fournie (jamais négatif). */
 export function ageMs(sinceEpochMs: number, clock: Clock): number {
   return Math.max(0, clock.nowMs() - sinceEpochMs);
