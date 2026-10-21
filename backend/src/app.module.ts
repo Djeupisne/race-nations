@@ -16,6 +16,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import configuration from './config/configuration';
 import { validateEnv } from './config/env.validation';
 
+import { CLOCK, SystemClock } from './common/utils/clock';
+
 import { PrismaModule } from './prisma/prisma.module';
 import { RedisModule } from './redis/redis.module';
 import { ObservabilityModule } from './observability/observability.module';
@@ -79,6 +81,8 @@ import { AdminModule } from './modules/admin/admin.module';
     AdminModule,
   ],
   providers: [
+    // Horloge injectable (INV-29) : SystemClock en prod, FixedClock en test.
+    { provide: CLOCK, useClass: SystemClock },
     // Guard global : aucune route n'est accessible sans JWT sauf @Public().
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },

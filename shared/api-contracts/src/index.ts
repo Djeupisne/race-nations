@@ -4,12 +4,14 @@
  * utilisés par backend (NestJS, ZodValidationPipe / INV-27), Unity (DTOs C#
  * miroirs documentés) et admin-panel (Next.js).
  *
- * ⚠️ Les modules match.ts / betting.ts / garage.ts / shop.ts / social.ts / admin.ts
+ * ⚠️ Les modules garage.ts / shop.ts / social.ts / admin.ts
  * suivront dans les phases ultérieures ; ce barrel n'expose que ce qui compile
- * aujourd'hui (Phase 1 : version, enums, auth, player).
+ * aujourd'hui (Phase 1 : version, enums, auth, player, match, betting).
  */
 
 export * from './version';
 export * from './enums';
 export * from './auth';
 export * from './player';
+export * from './match';
+export * from './betting';

@@ -382,6 +382,7 @@ model Match {
   betMarkets BetMarket[]
   players    MatchPlayer[]
   result     ResultPayload?
+  tickets    MatchmakingTicket[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

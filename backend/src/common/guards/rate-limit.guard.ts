@@ -6,9 +6,10 @@
  * Si Redis est indisponible : FAIL-CLOSED sur les routes monétaires (refus),
  * fail-open sinon — la dispo ne doit jamais créer de trou financier.
  */
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RateLimitedError } from '../errors/domain-errors';
+import { CLOCK, type Clock } from '../utils/clock';
 
 export interface RateLimitMeta {
   bucket: string;
@@ -54,7 +55,7 @@ export class RateLimitGuard implements CanActivate {
     private readonly reflector: Reflector,
     // RedisService typé structurellement pour éviter une dépendance circulaire de module.
     private readonly redis: { getClient(): SlidingWindowClient },
-    private readonly clock: { now(): number },
+    @Inject(CLOCK) private readonly clock: Clock,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -65,7 +66,7 @@ export class RateLimitGuard implements CanActivate {
     const key = `rl:${meta.bucket}:${identity}`;
     let result: number[] | number;
     try {
-      result = await this.redis.getClient().eval(SLIDING_WINDOW_LUA, 1, key, String(this.clock.now()), String(meta.windowMs), String(meta.limit));
+      result = await this.redis.getClient().eval(SLIDING_WINDOW_LUA, 1, key, String(this.clock.nowMs()), String(meta.windowMs), String(meta.limit));
     } catch {
       if (meta.failClosed) throw new RateLimitedError(Math.ceil(meta.windowMs / 1000));
       return true; // non-monétaire : disponibilité prioritaire
