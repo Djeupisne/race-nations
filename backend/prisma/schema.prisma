@@ -143,6 +143,7 @@ enum BetMarketStatus {
   OPEN
   CHALLENGED
   LOCKED
+  RUNNING   // match en cours après verrouillage des escrows (INV-15)
   SETTLING
   SETTLED   // terminal — UNIQUE(marketId) dans BetSettlement (INV-14)
   DISPUTED  // gel ≤ 72 h (INV-19)

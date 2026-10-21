@@ -58,8 +58,8 @@ export class OwnershipGuard implements CanActivate {
       throw new ForbiddenAdminError({}, 'You do not own this resource.');
     }
 
-    const id = meta.idParam ? req.params?.[meta.idParam] : undefined;
-    if (!id) throw new NotFoundError(meta.model);
+    const id: string | undefined = meta.idParam && req.params ? req.params[meta.idParam] : undefined;
+    if (!id) throw new NotFoundError(meta.model ?? 'resource', id);
 
     // Chargement défensif via le repository dédié au module appelant (injectable ailleurs) ;
     // ici on délègue au service passé en extension du request pour garder le guard sans dépendance DB directe.
