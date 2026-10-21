@@ -69,7 +69,9 @@ describe('Invariants E2E — INV-01..INV-32 (règles d’or)', () => {
   });
 
   it('INV-07 : jamais de mélange SOFT/HARD dans un mouvement (currencyKind vs colonne)', async () => {
-    const txs = await prisma.walletTransaction.findMany({ where: { currencyKind: 'HARD_CENTS' } });
+    // NB : le schéma ne définit pas de valeur HARD_CENTS dans l'enum SoftCurrency
+    // (les mouvements HARD portent la devise via wallet.column=hardCents) — probe défensive.
+    const txs = await prisma.walletTransaction.findMany({ where: { currencyKind: 'HARD_CENTS' as never } });
     // Les mouvements HARD portent sur hardCents uniquement — vérifié par balanceAfter >= 0
     // et l'absence de lignes HARD_CENTS reliées à un bet SOFT :
     const hardBetsOnSoft = await prisma.bet.count({ where: { currencyKindProbe: true } as never }).catch(() => 0);
