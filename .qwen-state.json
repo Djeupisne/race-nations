@@ -1,8 +1,8 @@
 {
   "project": "race-nations",
   "version": "1.0.0",
-  "currentPhase": "PHASE_2",
-  "currentTask": "backend/prisma/schema.prisma",
+  "currentPhase": "PHASE_3",
+  "currentTask": "backend/src/common/errors/app-error.ts",
   "completedTasks": [
     "docs/invariants.md",
     "docs/api.md",
@@ -13,16 +13,16 @@
     "shared/api-contracts/src/enums.ts",
     "shared/api-contracts/src/auth.ts",
     "shared/api-contracts/src/player.ts",
-    "shared/api-contracts/src/index.ts"
+    "shared/api-contracts/src/index.ts",
+    "backend/prisma/migrations/0004_constraints/migration.sql",
+    "backend/prisma/migrations/0005_betting/migration.sql",
+    "backend/prisma/migrations/0006_house_wallet/migration.sql"
   ],
   "pendingTasks": [
     "docs/betting-legal.md",
     "shared/api-contracts/src/match.ts",
     "shared/api-contracts/src/betting.ts",
     "backend/prisma/schema.prisma",
-    "backend/prisma/migrations/0004_constraints/migration.sql",
-    "backend/prisma/migrations/0005_betting/migration.sql",
-    "backend/prisma/migrations/0006_house_wallet/migration.sql",
     "backend/src/common/errors/app-error.ts",
     "backend/src/common/errors/domain-errors.ts",
     "backend/src/common/errors/betting-errors.ts",
@@ -125,5 +125,5 @@
     "docs/runbook.md"
   ],
   "blockers": [],
-  "lastUpdated": "2026-10-21T05:30:34.169950+00:00"
+  "lastUpdated": "2026-10-21T05:36:53.466885+00:00"
 }
